@@ -6,14 +6,13 @@
 /*   By: pniezen <pniezen@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/21 14:52:01 by pniezen       #+#    #+#                 */
-/*   Updated: 2022/11/29 20:48:04 by pniezen       ########   odam.nl         */
+/*   Updated: 2022/11/30 16:20:57 by pniezen       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <stdio.h>
 #include <unistd.h>
-#include <stdlib.h>
 
 static void	end_routine(t_info *info)
 {
@@ -35,15 +34,19 @@ static void	*routine(void *arg)
 	philo = arg;
 	while (true)
 	{
-		if (philo->index % 2 == 0)
-			usleep(200);
+		if (is_funeral(philo, ME) || is_funeral(philo, OTHER))
+			break ;
+		if (philo->id % 2 == 0)
+			usleep(250);
 		if (!eat(philo))
 			break ;
 		if (!sleeps(philo))
 			break ;
-		print_state(philo, THINKING);
+		if (!thinking(philo))
+			break ;
 	}
-	return (false);
+	// usleep(200);
+	return (NULL);
 }
 
 static void	start_routine(t_info *info)
@@ -70,6 +73,13 @@ int	main(int argc, char **argv)
 		return ((void)printf(WRONG_ARGUMENTS), 1);
 	if (!parse_arguments(argc, argv, &info))
 		return (1);
+	if (info.num_philos == 1)
+	{
+		printf("0 1 has taken a fork\n");
+		usleep(info.to_die);
+		printf("%ld 1 died\n", info.to_die);
+		return (0);
+	}
 	if (!init(&info))
 		return (1);
 	start_routine(&info);

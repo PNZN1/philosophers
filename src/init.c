@@ -6,7 +6,7 @@
 /*   By: pniezen <pniezen@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/27 13:54:09 by pniezen       #+#    #+#                 */
-/*   Updated: 2022/11/29 21:02:34 by pniezen       ########   odam.nl         */
+/*   Updated: 2022/11/30 16:53:06 by pniezen       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ static bool	init_forks(t_info *info)
 	while (i < info->num_philos)
 	{
 		if (pthread_mutex_init(&info->fork[i], NULL) != 0)
-			return (false);
+			return (destroy_locks(info, i), false);
 		i++;
 	}
 	return (true);
@@ -42,11 +42,13 @@ static bool	init_philos(t_info *info)
 	while (i < info->num_philos)
 	{
 		info->philos[i].info = info;
-		info->philos[i].index = i + 1;
+		info->philos[i].id = i + 1;
 		info->philos[i].time_last_meal = get_time_in_ms();
 		info->philos[i].times_eaten = 0;
-		info->philos[i].left_fork = &info->fork[i];
-		info->philos[i].right_fork = &info->fork[(i + 1) % info->num_philos];
+		info->philos[i].right_fork = &info->fork[i];
+		info->philos[i].left_fork = &info->fork[(i + 1) % info->num_philos];
+		if (pthread_mutex_init(&info->philos[i].philo_lock, NULL) != 0)
+			return (destroy_philo_locks(info, i), false);
 		i++;
 	}
 	return (true);
@@ -54,10 +56,13 @@ static bool	init_philos(t_info *info)
 
 bool	init(t_info *info)
 {
-	info->done = false;
-	info->start_time = get_time_in_ms();
-	if (info->start_time < 200)
+	if (pthread_mutex_init(&info->died_lock, NULL) != 0)
 		return (false);
+	// als deze aan staat dan blijft het programma ergens hangen....
+	if (pthread_mutex_init(&info->write_lock, NULL) != 0)
+		return (pthread_mutex_destroy(&info->died_lock), false);
+	info->start_time = get_time_in_ms();
+	info->died = false;
 	info->p_threads = malloc(sizeof(pthread_t) * info->num_philos);
 	if (!info->p_threads)
 		return (false);

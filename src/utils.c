@@ -6,7 +6,7 @@
 /*   By: pniezen <pniezen@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/27 14:07:41 by pniezen       #+#    #+#                 */
-/*   Updated: 2022/11/29 20:21:03 by pniezen       ########   odam.nl         */
+/*   Updated: 2022/11/30 16:11:39 by pniezen       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,30 +25,23 @@ long	get_time_in_ms(void)
 	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 }
 
-void	print_state(t_philo *philo, t_state state)
+long	get_time_running(t_info *info)
 {
-	long	cur_time;
+	return (get_time_in_ms() - info->start_time);
+}
 
-	pthread_mutex_lock(&philo->info->write_lock);
-	cur_time = get_time_in_ms() - philo->info->start_time;
-	if (state == DIED)
+void	destroy_philo_locks(t_info *info, int n)
+{
+	int	i;
+
+	i = 0;
+	while (i < n)
 	{
-		usleep(300);
-		printf("%ld %d died\n", cur_time, philo->index);
+		pthread_mutex_destroy(&info->philos[i].philo_lock);
+		i++;
 	}
-	if (is_funeral(philo, ME) || is_funeral(philo, OTHER))
-		return ;
-	if (state == TAKEN_FORK)
-		printf("%ld %d has taken a fork\n", cur_time, philo->index);
-	else if (state == EATING)
-		printf("%ld %d is eating\n", cur_time, philo->index);
-	else if (state == SLEEPING)
-		printf("%ld %d is sleeping\n", cur_time, philo->index);
-	else if (state == THINKING)
-		printf("%ld %d is thinking\n", cur_time, philo->index);
-	else if (state == DIED)
-		printf("%ld %d died\n", cur_time, philo->index);
-	pthread_mutex_unlock(&philo->info->write_lock);
+	free(info->philos);
+	info->philos = NULL;
 }
 
 void	destroy_locks(t_info *info, int n)
@@ -63,10 +56,13 @@ void	destroy_locks(t_info *info, int n)
 	}
 	free(info->fork);
 	info->fork = NULL;
+	pthread_mutex_destroy(&info->died_lock);
+	pthread_mutex_destroy(&info->write_lock);
 }
 
 void	free_all(t_info *info)
 {
+	destroy_philo_locks(info, info->num_philos);
 	destroy_locks(info, info->num_philos);
 	free(info->p_threads);
 	free(info->fork);

@@ -6,7 +6,7 @@
 /*   By: pniezen <pniezen@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/22 09:57:35 by pniezen       #+#    #+#                 */
-/*   Updated: 2022/11/29 20:47:07 by pniezen       ########   odam.nl         */
+/*   Updated: 2022/11/30 15:42:30 by pniezen       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,11 @@ struct s_philo
 {
 	t_info			*info;
 	pthread_mutex_t	philo_lock;
-	int				index;
+	int				id;
 	long			time_last_meal;
 	long			times_eaten;
-	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
+	pthread_mutex_t	*left_fork;
 };
 
 struct s_info
@@ -41,10 +41,11 @@ struct s_info
 	long			to_die;
 	long			to_eat;
 	long			to_sleep;
+	long			to_think;
 	long			num_times_philo_eat;
+	bool			eat_limit;
 	long			start_time;
 	bool			died;
-	bool			done;
 	pthread_mutex_t	died_lock;
 	pthread_mutex_t	write_lock;
 	pthread_mutex_t	*fork;
@@ -72,14 +73,21 @@ bool	init(t_info *info);
 //utils.c
 
 long	get_time_in_ms(void);
-void	print_state(t_philo *philo, t_state state);
+long	get_time_running(t_info *info);
+void	destroy_philo_locks(t_info *info, int n);
+void	destroy_locks(t_info *info, int n);
 void	free_all(t_info *info);
 
 //actions.c
 
-void	monitor(t_info *info);
 bool	eat(t_philo *philo);
 bool	sleeps(t_philo *philo);
+bool	thinking(t_philo *philo);
+
+//monitor.c
+
+void	monitor(t_info *info);
 bool	is_funeral(t_philo *philo, t_state who);
+void	print_state(t_philo *philo, t_state state);
 
 #endif
