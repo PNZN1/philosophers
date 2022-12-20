@@ -6,7 +6,7 @@
 /*   By: pniezen <pniezen@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/22 09:57:35 by pniezen       #+#    #+#                 */
-/*   Updated: 2022/11/30 15:42:30 by pniezen       ########   odam.nl         */
+/*   Updated: 2022/12/20 14:58:39 by pniezen       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 
 # define WRONG_ARGUMENTS "You didn't give the right arguments\ne.g.:\
 \n./philo 5 100 80 100\n"
+# define MAX_AMOUNT_PHILO "Maximum amount of philosophers is 200.\n\n"
 
 typedef struct s_philo	t_philo;
 typedef struct s_info	t_info;
@@ -29,6 +30,7 @@ struct s_philo
 	int				id;
 	long			time_last_meal;
 	long			times_eaten;
+	pthread_mutex_t	time_eat_lock;
 	pthread_mutex_t	*right_fork;
 	pthread_mutex_t	*left_fork;
 };
@@ -77,6 +79,10 @@ long	get_time_running(t_info *info);
 void	destroy_philo_locks(t_info *info, int n);
 void	destroy_locks(t_info *info, int n);
 void	free_all(t_info *info);
+
+//routine.c
+
+void	start_routine(t_info *info);
 
 //actions.c
 

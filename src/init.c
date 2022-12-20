@@ -6,7 +6,7 @@
 /*   By: pniezen <pniezen@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/27 13:54:09 by pniezen       #+#    #+#                 */
-/*   Updated: 2022/11/30 16:53:06 by pniezen       ########   odam.nl         */
+/*   Updated: 2022/12/20 12:32:12 by pniezen       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@ bool	init(t_info *info)
 {
 	if (pthread_mutex_init(&info->died_lock, NULL) != 0)
 		return (false);
-	// als deze aan staat dan blijft het programma ergens hangen....
 	if (pthread_mutex_init(&info->write_lock, NULL) != 0)
 		return (pthread_mutex_destroy(&info->died_lock), false);
 	info->start_time = get_time_in_ms();

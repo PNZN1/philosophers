@@ -4,9 +4,9 @@ INC_PATH = include
 
 NAME = philo
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror #-g -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror
 
-SRC = main.c parsing.c init.c utils.c actions.c monitor.c
+SRC = main.c parsing.c init.c utils.c routine.c actions.c monitor.c
 
 SRC_PRE = $(addprefix $(SRC_PATH)/,$(SRC))
 OBJ = $(addprefix $(OBJ_PATH)/,$(SRC_PRE:.c=.o))
